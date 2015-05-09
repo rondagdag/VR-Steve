@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <meta charset="utf-8">
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px;
+        position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%;
+        margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255);
+        border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script type="text/javascript">
+    var robot;
+
+    window.onload = function() {
+      // We connect to the 'chappie' robot using its namespace(nsp)
+      robot = io('http://localhost:8001/api/robots/chappie');
+
+      // Listen to the 'message' event on the robot
+      robot.on('message', function(msg) {
+        $('#messages').append($('<li>').text(msg));
+      });
+
+      // Listen for robot specific events, this must be declared
+      // when defining a robot in cylon
+      robot.on('turned_on', function(){
+        console.log('The robot "chappie" just turned ON its led!!!');
+      });
+
+      robot.on('turned_off', function(){
+        console.log('The robot "chappie" just turned OFF its led!!!');
+      });
+
+      // The "hello world" program of robotics, the
+      // blink and LED program, we accomplish this just
+      // by emitting the command we want our robot to execute
+      //setInterval(function() {
+      //  robot.emit('toggle');
+      //}, 1000);
+
+      msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
+
+      $('#messages').append($('<li>').text(msg));
+
+      $('form').submit(function(){
+        robot.emit('message', $('#m').val());
+        $('#m').val('');
+
+        return false;
+      });
+    };
+  </script>
+  <body>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+  </body>
+</html>
