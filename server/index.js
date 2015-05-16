@@ -21,6 +21,9 @@
 // To avoid the EXDEV rename error, see http://stackoverflow.com/q/21071303/76173
 //process.env.TMPDIR ='tmp' ;
 //process.env ['NODE_TLS_REJECT_UNAUTHORIZED'] ='0' ; // Ignore 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' authorization error
+
+
+
 console.log ('Working directory: ' + __dirname) ;
 
 var express =require ('express') ;
@@ -63,7 +66,7 @@ Cylon.robot({
   devices: {
     led: { driver: "led", pin: 1 },
     //button: { driver: "button", pin: 0 },
-    leapmotion: { driver: 'leapmotion' },
+    //leapmotion: { driver: 'leapmotion' },
 
     //button: { driver: "button", pin: 0 }
     button0: { driver: "button", pin: 0 },
