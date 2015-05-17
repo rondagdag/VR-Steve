@@ -41,6 +41,12 @@
         console.log('The robot "chappie" just turned OFF its led!!!');
       });
 
+
+
+      robot.on('hand', function(payload){
+        console.log('got hand', payload);
+      });
+
       // The "hello world" program of robotics, the
       // blink and LED program, we accomplish this just
       // by emitting the command we want our robot to execute

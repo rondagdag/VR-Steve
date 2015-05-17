@@ -21,9 +21,6 @@
 // To avoid the EXDEV rename error, see http://stackoverflow.com/q/21071303/76173
 //process.env.TMPDIR ='tmp' ;
 //process.env ['NODE_TLS_REJECT_UNAUTHORIZED'] ='0' ; // Ignore 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' authorization error
-
-
-
 console.log ('Working directory: ' + __dirname) ;
 
 var express =require ('express') ;
@@ -36,13 +33,14 @@ var lmvToken =require ('./lmv-token') ;
 var fist = false;
 var isOpen = false;
 var Cylon = require('cylon');
+var currentFrame;
 
 Cylon.robot({
   name: 'chappie',
 
   // This is how we define custom events that will be registered
   // by the API.
-  events: ['turned_on', 'turned_off', 'show', 'hide'],
+  events: ['turned_on', 'turned_off', 'show', 'hide', 'hand'],
 
   // These are the commands that will be availble in the API
   // Commands method needs to return an object with the aliases
@@ -52,24 +50,25 @@ Cylon.robot({
       turn_on: this.turnOn,
       turn_off: this.turnOff,
       show : this.show,
+      hand : this.hand,
       //toggle: this.toggle
     };
   },
 
   connections: {
     arduino: { adaptor: "firmata", port: "/dev/tty.usbmodem14131" },
-    leapmotion: { adaptor: 'leapmotion' },
+    leap: { adaptor: 'leapmotion' },
     //arduino: { adaptor: 'firmata', port: '/dev/tty.usbmodem1411' }
 
   },
 
   devices: {
-    led: { driver: "led", pin: 1 },
+    //led: { driver: "led", pin: 1 },
     //button: { driver: "button", pin: 0 },
-    //leapmotion: { driver: 'leapmotion' },
+    leapmotion: { driver: 'leapmotion' },
 
     //button: { driver: "button", pin: 0 }
-    button0: { driver: "button", pin: 0 },
+    //button0: { driver: "button", pin: 0 },
     sensor1: { driver: "analogSensor", pin: 0, upperLimit: 500, lowerLimit: 10 },
     sensor2: { driver: "analogSensor", pin: 1, upperLimit: 500, lowerLimit: 10 }
   },
@@ -91,6 +90,11 @@ Cylon.robot({
       this.emit('show');
   },
 
+
+  hand: function(payload) {
+        //this.led.turnOff();
+        this.emit('hand', payload);
+    },
   //toggle: function() {
   //  this.led.toggle();
   //  if (this.led.isOn()) {
@@ -109,17 +113,19 @@ Cylon.robot({
     });
 */
 
-   /*my.sensor2.on("analogRead", function(val) {
+  /* my.sensor2.on("analogRead", function(val) {
       console.log("analog read value:", val);
       console.log("analog read value:", my.sensor2.analogRead());
-    });
+    });*/
 
     my.sensor1.on("upperLimit", function(val) {
       console.log("Upper limit reached ===> " + val);
 
       my.emit('show');
     });
-*/
+
+
+/*
     my.sensor2.on("upperLimit", function(val) {
       console.log("Upper limit reached ===> " + val);
       my.emit('show');
@@ -137,27 +143,31 @@ Cylon.robot({
         console.log("button released");
         //console.log("digital read value:", my.button0.digitalRead());
       });
-/*
+      */
+
     my.sensor1.on("lowerLimit", function(val) {
-      console.log("Lower limit reached ===> " + val);
+      //console.log("Lower limit reached ===> " + val);
       my.emit('hide');
     });
 
-    my.sensor2.on("lowerLimit", function(val) {
+    /*my.sensor2.on("lowerLimit", function(val) {
       console.log("Lower limit reached ===> " + val);
       my.emit('hide');
-    });
-*/
+    });*/
+
     /*my.button.on("push", function(payload) {
         console.log("pushed");
         my.led.toggle();
       });*/
 
-    my.leapmotion.on('hand', function(payload) {
+    my.leap.on('hand', function(payload) {
       //console.log(payload.toString());
       //my.emit('turned_on');
 
-			//console.log(payload.frame);
+			//console.log(payload.frame.gestures);
+      //currentFrame = payload.frame;
+      //my.emit('hand', payload.frame.gestures);
+
 
 			if (payload.frame.hands[0].grabStrength > 0.5)
 			{
@@ -224,7 +234,7 @@ Cylon.robot({
 
 		every((2).second(), function() {
       //my.led.toggle();
-
+      //my.emit('hand', currentFrame);
 			console.log(fist);
 			if (fist == true)
 			{
